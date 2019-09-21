@@ -1,5 +1,7 @@
+require('dotenv').config();
 const { ApolloServer, gql } = require('apollo-server-micro')
 
+// The API: Queries, Muts, Subs which are available:
 const typeDefs = gql`
   type Query {
     hello: String,
@@ -30,7 +32,10 @@ const server = new ApolloServer({
   typeDefs,
   resolvers,
   introspection: true,
-  playground: true
+  playground: true,
+	engine: {
+    apiKey: process.env.ENGINE_API_KEY
+  },
 })
 
 module.exports = server.createHandler({ path: '/api' })

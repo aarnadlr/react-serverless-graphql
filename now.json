@@ -1,0 +1,8 @@
+{
+  "name": "react-serverless-graphql",
+  "version": 2,
+  "scope": "aarnadlr",
+  "env": {
+    "ENGINE_API_KEY": "@engine_api_key"
+  }
+}
