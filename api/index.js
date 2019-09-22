@@ -1,31 +1,41 @@
 require('dotenv').config();
 const { ApolloServer, gql } = require('apollo-server-micro');
+const mongoose = require('mongoose');
 
-const books = [
-  {
-    title: 'Book title 1',
-    author: 'Asher'
-  },
-  {
-    title: 'Book title2',
-    author: 'Charley'
-  }
-];
+const Post = require('../models/Post');
+const User = require('../models/User');
+
+mongoose
+  .connect(process.env.MONGODB_MERNG_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+  })
+  .then(() => console.log('DB CONNECTED!'));
+
 
 // The API: All Queries, Mutations, Subs available:
 const typeDefs = gql`
+	type Post  {
+			id: ID
+			body: String
+			createdAt: String
+			username: String
+	}
   type Query {
-    books:[Book]
-  }
-  type Book{
-    title:String
-    author:String
+    getPosts:[Post]
   }
 `;
 
 const resolvers = {
   Query: {
-    books:()=>books
+    getPosts: async () => {
+    	try{
+    		const Posts = await Post.find();
+    		return Posts;
+			}catch(e){
+    		throw new Error(e);
+			}
+		}
   }
 };
 

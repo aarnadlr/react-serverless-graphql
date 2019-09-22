@@ -3,6 +3,7 @@
   "version": 2,
   "scope": "aarnadlr",
   "env": {
-    "ENGINE_API_KEY": "@engine_api_key"
+    "ENGINE_API_KEY": "@engine_api_key",
+    "MONGODB_MERNG_URI": "@mongodb_merng_uri"
   }
 }
