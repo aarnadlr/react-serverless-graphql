@@ -1,10 +1,11 @@
 require('dotenv').config();
-const { ApolloServer, gql } = require('apollo-server-micro');
+const { ApolloServer } = require('apollo-server-micro');
 const mongoose = require('mongoose');
 
-const Post = require('../models/Post');
-const User = require('../models/User');
+const typeDefs = require('../graphql/typeDefs');
+const resolvers = require('../graphql/resolvers');
 
+// Connection to MongoDB Atlas for all queries/operations
 mongoose
   .connect(process.env.MONGODB_MERNG_URI, {
     useNewUrlParser: true,
@@ -12,32 +13,6 @@ mongoose
   })
   .then(() => console.log('DB CONNECTED!'));
 
-
-// The API: All Queries, Mutations, Subs available:
-const typeDefs = gql`
-	type Post  {
-			id: ID
-			body: String
-			createdAt: String
-			username: String
-	}
-  type Query {
-    getPosts:[Post]
-  }
-`;
-
-const resolvers = {
-  Query: {
-    getPosts: async () => {
-    	try{
-    		const Posts = await Post.find();
-    		return Posts;
-			}catch(e){
-    		throw new Error(e);
-			}
-		}
-  }
-};
 
 const server = new ApolloServer({
   typeDefs,
