@@ -3,10 +3,10 @@ const { gql } = require('apollo-server-micro');
 // The GraphQL API: All Queries, Mutations, Subs available:
 module.exports = gql`
   type Post {
-    id: ID
-    body: String
-    createdAt: String
-    username: String
+    id: ID!
+    body: String!
+    createdAt: String!
+    username: String!
   }
 
   type User {
@@ -26,11 +26,14 @@ module.exports = gql`
 
   type Query {
     getPosts: [Post]
+    getPost(postId: ID!): Post
     getUsers: [User]
   }
 
   type Mutation {
     register(registerInput: RegisterInput): User!
-			login(username: String!, password: String!): User!
+    login(username: String!, password: String!): User!
+    createPost(body: String!): Post!
+		deletePost(postId:ID!): String!
   }
 `;
