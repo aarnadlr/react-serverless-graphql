@@ -5,10 +5,54 @@ const { UserInputError } = require('apollo-server');
 const Post = require('../../models/Post');
 const User = require('../../models/User');
 
-const { validateRegisterInput } = require('../../util/validators');
+const {
+  validateRegisterInput,
+  validateLoginInput
+} = require('../../util/validators');
+
+function generateToken(user) {
+  return jwt.sign(
+    {
+      id: user.id,
+      email: user.email,
+      username: user.username
+    },
+    process.env.SECRET_KEY,
+    { expiresIn: '1h' }
+  );
+}
 
 module.exports = {
   Mutation: {
+    async login(parent, { username, password }) {
+      const { errors, valid } = validateLoginInput(username, password);
+      const user = await User.findOne({ username });
+
+      if (!valid) {
+        throw new UserInputError('Errors', { errors });
+      }
+
+      if (!user) {
+        errors.general = 'User not found';
+        throw new UserInputError('User not found', { errors });
+      }
+
+      const match = await bcrypt.compare(password, user.password);
+      if (!match) {
+        errors.general = 'Wrong credentials';
+        throw new UserInputError('Wrong credentials', { errors });
+      }
+
+      // If they get here, the password is correct, so we give them a token
+      const token = generateToken(user);
+
+      return {
+        ...user._doc,
+        id: user._id,
+        token
+      };
+    },
+
     async register(
       _,
       {
@@ -48,15 +92,7 @@ module.exports = {
 
       const res = await newUser.save();
 
-      const token = jwt.sign(
-        {
-          id: res.id,
-          email: res.email,
-          username: res.username
-        },
-        process.env.SECRET_KEY,
-        { expiresIn: '1h' }
-      );
+      const token = generateToken(res);
 
       return {
         ...res._doc,
@@ -75,14 +111,5 @@ module.exports = {
         throw new Error(e);
       }
     }
-
-    // getUsers: async () => {
-    //   try {
-    //     const Users = await User.find();
-    //     return Users;
-    //   } catch (e) {
-    //     throw new Error(e);
-    //   }
-    // }
   }
 };
