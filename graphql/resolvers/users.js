@@ -5,6 +5,8 @@ const { UserInputError } = require('apollo-server');
 const Post = require('../../models/Post');
 const User = require('../../models/User');
 
+const { validateRegisterInput } = require('../../util/validators');
+
 module.exports = {
   Mutation: {
     async register(
@@ -16,6 +18,15 @@ module.exports = {
       info
     ) {
       // Validate user data
+      const { valid, errors } = validateRegisterInput(
+        username,
+        email,
+        password,
+        confirmPassword
+      );
+      if (!valid) {
+        throw new UserInputError('Errors', { errors });
+      }
       // Make sure user doesnt already exist
       const user = await User.findOne({ username });
       if (user) {
