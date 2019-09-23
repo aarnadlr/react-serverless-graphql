@@ -29,6 +29,7 @@ module.exports = {
   },
 
   Mutation: {
+
     async createPost(_, { body }, context) {
       const user = checkAuth(context);
 
@@ -45,6 +46,7 @@ module.exports = {
 
       return post;
     },
+
     async deletePost(_, { postId }, context) {
       const user = checkAuth(context);
 
